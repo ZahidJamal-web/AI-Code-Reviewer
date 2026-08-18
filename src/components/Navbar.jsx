@@ -1,27 +1,108 @@
-import React from "react";
+import {
+  Bot,
+  ChevronDown,
+  Moon,
+  Play,
+  Sparkles,
+  Sun
+} from "lucide-react";
 
-const Navbar = ({ darkMode, toggleDarkMode }) => {
+export default function Navbar({
+  theme,
+  onThemeChange,
+  onReview,
+  onRun,
+  reviewing,
+  running,
+  activeFile
+}) {
   return (
-    <nav className="flex items-center justify-between px-4 py-3 bg-purple-600 dark:bg-purple-600 shadow-md">
-      {/* Left: Logo + Title */}
-      <div className="flex items-center space-x-3">
-        <img
-          src="https://static.thenounproject.com/png/1266207-200.png"
-          alt="Coditor Logo"
-          className="w-8 h-8"
-        />
-        <span className="text-white text-2xl font-bold">PixelCode</span>
+    <header className="navbar">
+
+      {/* BRAND */}
+      <div className="brand">
+        <div className="brand-icon">
+          <Bot size={19} />
+        </div>
+
+        <div>
+          <div className="brand-name">
+            PixelCode
+          </div>
+
+          <div className="brand-subtitle">
+            AI Code Reviewer
+          </div>
+        </div>
       </div>
 
-      {/* Right: Theme Toggle */}
-      <button
-        onClick={toggleDarkMode}
-        className="px-3 py-1 rounded-lg bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200 hover:opacity-80 transition"
-      >
-        {darkMode ? "🌞 " : "🌙 "}
-      </button>
-    </nav>
-  );
-};
+      {/* PROJECT */}
+      <div className="project-selector">
+        <span className="project-dot" />
 
-export default Navbar;
+        <span>PixelCode Project</span>
+
+        <ChevronDown size={15} />
+      </div>
+
+      <div className="nav-spacer" />
+
+      {/* CURRENT FILE */}
+      <div className="current-file">
+        <span className="python-dot" />
+
+        {activeFile?.name || "main.py"}
+      </div>
+
+      {/* RUN */}
+      <button
+        className={`nav-button ${
+          running ? "loading" : ""
+        }`}
+        onClick={onRun}
+        disabled={running}
+      >
+        <Play size={15} />
+
+        <span>
+          {running ? "Running..." : "Run"}
+        </span>
+      </button>
+
+      {/* AI REVIEW */}
+      <button
+        className={`review-button ${
+          reviewing ? "loading" : ""
+        }`}
+        onClick={onReview}
+        disabled={reviewing}
+      >
+        <Sparkles size={16} />
+
+        {reviewing
+          ? "Reviewing..."
+          : "Review Code"}
+      </button>
+
+      {/* THEME */}
+      <button
+        className="theme-button"
+        onClick={() =>
+          onThemeChange(
+            theme === "dark"
+              ? "light"
+              : "dark"
+          )
+        }
+        aria-label="Toggle theme"
+      >
+        {theme === "dark" ? (
+          <Sun size={18} />
+        ) : (
+          <Moon size={18} />
+        )}
+      </button>
+
+    </header>
+  );
+}
