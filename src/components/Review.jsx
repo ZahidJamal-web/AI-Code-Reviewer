@@ -12,19 +12,6 @@ import {
   Zap
 } from "lucide-react";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
-const response = await fetch(`${API_URL}/api/review`, {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-        code,
-        language
-    })
-});
-
 export default function Review({
   review,
   reviewing,
