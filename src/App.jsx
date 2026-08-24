@@ -412,13 +412,6 @@ export default function App() {
 
   }
 
-
-  /*
-  |--------------------------------------------------------------------------
-  | AI Code Review
-  |--------------------------------------------------------------------------
-  */
-
   async function reviewCode() {
 
     if (!activeFile?.code?.trim()) {
@@ -431,6 +424,22 @@ export default function App() {
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Don't review unchanged code
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+      activeFile.lastReviewedCode ===
+      activeFile.code
+    ) {
+
+      return;
+
+    }
+
+
     setReviewing(true);
 
     setError("");
@@ -440,48 +449,83 @@ export default function App() {
 
     try {
 
-      const response = await fetch(
-        "http://localhost:5000/api/review",
-        {
-          method: "POST",
+      const response =
+        await fetch(
+          "http://localhost:5000/api/review",
+          {
+            method: "POST",
 
-          headers: {
-            "Content-Type": "application/json"
-          },
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
 
-          body: JSON.stringify({
+            body: JSON.stringify({
 
-            code: activeFile.code,
+              code:
+                activeFile.code,
 
-            language: activeFile.language,
+              language:
+                activeFile.language,
 
-            filename: activeFile.name
+              filename:
+                activeFile.name
 
-          })
-        }
-      );
-
-
-      const data = await response.json();
+            })
+          }
+        );
 
 
-      if (!response.ok || !data.success) {
+      const data =
+        await response.json();
+
+
+      if (
+        !response.ok ||
+        !data.success
+      ) {
 
         throw new Error(
           data.error ||
-          "AI code review failed."
+          "Code review failed."
         );
 
       }
 
 
-      setReview(data.review);
+      setReview(
+        data.review
+      );
+
+
+      /*
+      |--------------------------------------------------------------------------
+      | Remember reviewed version
+      |--------------------------------------------------------------------------
+      */
+
+      setFiles(
+        (currentFiles) =>
+          currentFiles.map(
+            (file) =>
+              file.id ===
+              activeFileId
+                ? {
+                    ...file,
+
+                    lastReviewedCode:
+                      file.code
+                  }
+                : file
+          )
+      );
+
 
     } catch (err) {
 
       setError(
         err.message ||
-        "Unable to connect to the PixelCode backend."
+        "Unable to connect to PixelCode backend."
       );
 
     } finally {

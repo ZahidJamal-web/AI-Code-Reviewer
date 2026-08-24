@@ -1,7 +1,10 @@
 node_modules/
+backend/node_modules/
+backend/temp_exec/
 dist/
 
 .env
+backend/.env
 .env.local
 .env.*.local
 
@@ -9,3 +12,4 @@ dist/
 
 .DS_Store
 .vscode/
+.vercel/
