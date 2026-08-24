@@ -63,11 +63,12 @@ if (!fs.existsSync(TEMP_DIR)) {
 |--------------------------------------------------------------------------
 */
 
-app.use(
-  cors({
-    origin: CLIENT_URL
-  })
-);
+app.use(cors({
+    origin: [
+        "http://localhost:5173",
+        "https://pixelcode-ai.vercel.app"
+    ]
+}));
 
 app.use(
   express.json({
