@@ -12,6 +12,29 @@ import {
   Zap
 } from "lucide-react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+// 🟢 Wrap the fetch logic inside an async function
+export const submitReview = async (code, language) => {
+    try {
+        const response = await fetch(`${API_URL}/api/review`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ code, language })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Failed to submit review:", error);
+        throw error;
+    }
+};
 
 export default function Review({
   review,
