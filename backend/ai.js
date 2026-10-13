@@ -2,11 +2,11 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const OLLAMA_URL =
-  process.env.OLLAMA_URL || "http://localhost:11434";
+const OPENROUTER_URL =
+  process.env.OPENROUTER_URL || "http://localhost:11434";
 
-const OLLAMA_MODEL =
-  process.env.OLLAMA_MODEL || "qwen2.5-coder:7b";
+const OPENROUTER_MODEL =
+  process.env.OPENROUTER_MODEL || "qwen2.5-coder:7b";
 
 const AI_TIMEOUT =
   Number(process.env.AI_TIMEOUT_MS) || 4200;
@@ -333,11 +333,11 @@ ${code}
 
 /*
 |--------------------------------------------------------------------------
-| Ollama request with timeout
+| OPENROUTER request with timeout
 |--------------------------------------------------------------------------
 */
 
-async function callOllama(prompt) {
+async function callOPENROUTER(prompt) {
 
   const controller = new AbortController();
 
@@ -349,7 +349,7 @@ async function callOllama(prompt) {
   try {
 
     const response = await fetch(
-      `${OLLAMA_URL}/api/generate`,
+      `${OPENROUTER_URL}/api/generate`,
       {
         method: "POST",
 
@@ -358,7 +358,7 @@ async function callOllama(prompt) {
         },
 
         body: JSON.stringify({
-          model: OLLAMA_MODEL,
+          model: OPENROUTER_MODEL,
           prompt,
 
           stream: false,
@@ -379,7 +379,7 @@ async function callOllama(prompt) {
 
     if (!response.ok) {
       throw new Error(
-        `Ollama returned HTTP ${response.status}`
+        `OPENROUTER returned HTTP ${response.status}`
       );
     }
 
@@ -387,7 +387,7 @@ async function callOllama(prompt) {
     const data = await response.json();
 
     if (!data.response) {
-      throw new Error("Ollama returned an empty response.");
+      throw new Error("OPENROUTER returned an empty response.");
     }
 
 
@@ -442,7 +442,7 @@ export async function reviewCode({
       staticFindings
     });
 
-    aiReview = await callOllama(prompt);
+    aiReview = await callOPENROUTER(prompt);
 
   } catch (error) {
 
