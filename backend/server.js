@@ -16,11 +16,11 @@ const PORT = process.env.PORT || 5000;
 const CLIENT_URL =
   process.env.CLIENT_URL || "http://localhost:5173";
 
-const OPENROUTER_URL =
-  process.env.OPENROUTER_URL || "http://localhost:11434";
+const OLLAMA_URL =
+  process.env.OLLAMA_URL || "http://localhost:11434";
 
-const OPENROUTER_MODEL =
-  process.env.OPENROUTER_MODEL || "qwen2.5-coder:7b";
+const OLLAMA_MODEL =
+  process.env.OLLAMA_MODEL || "qwen2.5-coder:7b";
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +29,7 @@ const OPENROUTER_MODEL =
 |
 | Static analysis runs immediately.
 |
-| OPENROUTER is given a maximum of 4 seconds.
+| Ollama is given a maximum of 4 seconds.
 | This keeps the total review request around 5 seconds.
 |
 */
@@ -652,10 +652,10 @@ function mergeReviews({
       staticAnalysis: true,
       aiAnalysis: Boolean(aiReview),
       aiProvider: aiReview
-        ? "OPENROUTER"
+        ? "ollama"
         : "static",
       aiModel: aiReview
-        ? OPENROUTER_MODEL
+        ? OLLAMA_MODEL
         : null
     }
   };
@@ -676,11 +676,11 @@ app.get(
       message:
         "PixelCode backend is running",
 
-      provider: "OPENROUTER",
+      provider: "ollama",
 
-      OPENROUTERUrl: OPENROUTER_URL,
+      ollamaUrl: OLLAMA_URL,
 
-      model: OPENROUTER_MODEL,
+      model: OLLAMA_MODEL,
 
       reviewTimeout:
         AI_REVIEW_TIMEOUT,
@@ -1517,15 +1517,15 @@ app.listen(
     );
 
     console.log(
-      `🤖 AI Provider: NVIDIA`
+      `🤖 AI Provider: Ollama`
     );
 
     console.log(
-      `🔗 Nvidia: ${OPENROUTER_URL}`
+      `🔗 Ollama: ${OLLAMA_URL}`
     );
 
     console.log(
-      `🧠 Model: ${OPENROUTER_MODEL}`
+      `🧠 Model: ${OLLAMA_MODEL}`
     );
 
     console.log(
