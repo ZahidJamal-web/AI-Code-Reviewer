@@ -47,15 +47,14 @@ const MAX_AI_CODE_LINES =
 */
 
 const TEMP_DIR = path.join(
-  process.cwd(),
-  "temp_exec"
+  process.env.TMPDIR || (process.platform === "win32" ? process.env.TEMP : "/tmp"),
+  "pixelcode-temp_exec"
 );
 
-if (!fs.existsSync(TEMP_DIR)) {
-  fs.mkdirSync(TEMP_DIR, {
-    recursive: true
-  });
-}
+fs.mkdirSync(TEMP_DIR, {
+  recursive: true
+});
+
 
 /*
 |--------------------------------------------------------------------------
