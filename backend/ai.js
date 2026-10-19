@@ -2,15 +2,19 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const OPENROUTER_URL =
-  process.env.OPENROUTER_URL;
+const OPENROUTER_URL = (
+  process.env.OPENROUTER_URL ||
+  "https://openrouter.ai/api/v1"
+).replace(/\/+$/, "");
+
+const OPENROUTER_API_KEY =
+  process.env.OPENROUTER_API_KEY;
 
 const OPENROUTER_MODEL =
   process.env.OPENROUTER_MODEL;
 
 const AI_TIMEOUT =
-  Number(process.env.AI_TIMEOUT_MS) || 4200;
-
+  Number(process.env.AI_TIMEOUT_MS) || 30000;
 
 /*
 |--------------------------------------------------------------------------
