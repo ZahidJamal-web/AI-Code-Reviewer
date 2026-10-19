@@ -3,10 +3,10 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const OPENROUTER_URL =
-  process.env.OPENROUTER_URL || "http://localhost:11434";
+  process.env.OPENROUTER_URL;
 
 const OPENROUTER_MODEL =
-  process.env.OPENROUTER_MODEL || "qwen2.5-coder:7b";
+  process.env.OPENROUTER_MODEL;
 
 const AI_TIMEOUT =
   Number(process.env.AI_TIMEOUT_MS) || 4200;
@@ -337,7 +337,15 @@ ${code}
 |--------------------------------------------------------------------------
 */
 
+
 async function callOPENROUTER(prompt) {
+  if (!OPENROUTER_API_KEY) {
+    throw new Error("OPENROUTER_API_KEY is missing.");
+  }
+
+  if (!OPENROUTER_MODEL) {
+    throw new Error("OPENROUTER_MODEL is missing.");
+  }
 
   const controller = new AbortController();
 
@@ -345,59 +353,61 @@ async function callOPENROUTER(prompt) {
     controller.abort();
   }, AI_TIMEOUT);
 
-
   try {
-
     const response = await fetch(
-      `${OPENROUTER_URL}/api/generate`,
+      `${OPENROUTER_URL}/chat/completions`,
       {
         method: "POST",
-
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+          "HTTP-Referer": "https://pixelcode-ai.vercel.app",
+          "X-Title": "PixelCode AI Code Reviewer"
         },
-
         body: JSON.stringify({
           model: OPENROUTER_MODEL,
-          prompt,
-
-          stream: false,
-
-          format: "json",
-
-          options: {
-            temperature: 0.1,
-            top_p: 0.8,
-            num_predict: 1800
+          messages: [
+            {
+              role: "user",
+              content: prompt
+            }
+          ],
+          temperature: 0.1,
+          max_tokens: 6000,
+          response_format: {
+            type: "json_object"
           }
         }),
-
         signal: controller.signal
       }
     );
 
-
     if (!response.ok) {
+      const errorText = await response.text();
+
       throw new Error(
-        `OPENROUTER returned HTTP ${response.status}`
+        `OpenRouter HTTP ${response.status}: ${errorText.slice(0, 500)}`
       );
     }
 
-
     const data = await response.json();
+    const content = data.choices?.[0]?.message?.content;
 
-    if (!data.response) {
-      throw new Error("OPENROUTER returned an empty response.");
+    if (!content || typeof content !== "string") {
+      throw new Error("OpenRouter returned an empty response.");
     }
 
+    return safeJsonParse(content);
+  } catch (error) {
+    if (error.name === "AbortError") {
+      throw new Error("AI review timed out. Please try again.");
+    }
 
-    return safeJsonParse(data.response);
-
+    throw error;
   } finally {
     clearTimeout(timeout);
   }
 }
-
 
 /*
 |--------------------------------------------------------------------------

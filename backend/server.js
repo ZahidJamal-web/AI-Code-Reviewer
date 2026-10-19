@@ -17,10 +17,10 @@ const CLIENT_URL =
   process.env.CLIENT_URL || "http://localhost:5173";
 
 const OPENROUTER_API_KEY =
-  process.env.OPENROUTER_API_KEY || "http://localhost:11434";
+  process.env.OPENROUTER_API_KEY;
 
 const OPENROUTER_MODEL =
-  process.env.OPENROUTER_MODEL || "qwen2.5-coder:7b";
+  process.env.OPENROUTER_MODEL;
 
 /*
 |--------------------------------------------------------------------------
