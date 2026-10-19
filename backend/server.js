@@ -16,8 +16,8 @@ const PORT = process.env.PORT || 5000;
 const CLIENT_URL =
   process.env.CLIENT_URL || "http://localhost:5173";
 
-const OPENROUTER_URL =
-  process.env.OPENROUTER_URL || "http://localhost:11434";
+const OPENROUTER_API_KEY =
+  process.env.OPENROUTER_API_KEY || "http://localhost:11434";
 
 const OPENROUTER_MODEL =
   process.env.OPENROUTER_MODEL || "qwen2.5-coder:7b";
@@ -678,7 +678,7 @@ app.get(
 
       provider: "OPENROUTER",
 
-      OPENROUTERUrl: OPENROUTER_URL,
+      OPENROUTERUrl: OPENROUTER_API_KEY,
 
       model: OPENROUTER_MODEL,
 
@@ -1521,7 +1521,7 @@ app.listen(
     );
 
     console.log(
-      `🔗 Nvidia: ${OPENROUTER_URL}`
+      `🔗 Nvidia: ${OPENROUTER_API_KEY}`
     );
 
     console.log(
