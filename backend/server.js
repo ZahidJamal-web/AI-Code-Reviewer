@@ -1459,6 +1459,16 @@ app.post(
   }
 );
 
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "PixelCode AI backend is running!",
+    health: "/api/health",
+    review: "/api/review",
+    run: "/api/run"
+  });
+});
+
 /*
 |--------------------------------------------------------------------------
 | 404
