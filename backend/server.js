@@ -673,9 +673,6 @@ app.get(
     res.json({
       success: true,
       message: "PixelCode backend is running",
-      provider: "OpenRouter",
-      model: OPENROUTER_MODEL || "not configured",
-      staticAnalysis: true
     });
   }
 );
@@ -1480,21 +1477,15 @@ app.use(
 );
 
 
-/*
-|--------------------------------------------------------------------------
-| SERVER
-|--------------------------------------------------------------------------
-*/
-
 // Export the Express application for Vercel.
+
 export default app;
 
-// Start a local server only outside Vercel.
 if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 5000;
+
   app.listen(PORT, () => {
     console.log(`PixelCode backend running at http://localhost:${PORT}`);
-    console.log(`AI provider: OpenRouter`);
-    console.log(`AI model: ${OPENROUTER_MODEL || "not configured"}`);
-    console.log(`Static analysis: enabled`);
   });
 }
+
