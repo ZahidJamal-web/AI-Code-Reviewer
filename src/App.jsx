@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
@@ -173,7 +174,7 @@ main()
     name: "Dart",
     extension: "dart",
     starter: `void main() {
-  print("Hello, World!");
+    print("Hello, World!");
 }
 `
   },
@@ -182,9 +183,9 @@ main()
     name: "Scala",
     extension: "scala",
     starter: `object Main {
-  def main(args: Array[String]): Unit = {
-    println("Hello, World!")
-  }
+    def main(args: Array[String]): Unit = {
+        println("Hello, World!")
+    }
 }
 `
   },
@@ -254,14 +255,10 @@ SELECT 'Hello, World!' AS message;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Hello World</title>
 </head>
-
 <body>
-
     <h1>Hello, World!</h1>
-
 </body>
 </html>
 `
@@ -287,9 +284,6 @@ h1 {
 |--------------------------------------------------------------------------
 | Initial workspace
 |--------------------------------------------------------------------------
-|
-| Only ONE file is created by default.
-|
 */
 
 const initialFiles = [
@@ -301,19 +295,78 @@ const initialFiles = [
   }
 ];
 
+/*
+|--------------------------------------------------------------------------
+| File extension mapping
+|--------------------------------------------------------------------------
+*/
+
+const extensionLanguages = {
+  py: "python",
+  js: "javascript",
+  jsx: "javascript",
+  mjs: "javascript",
+  cjs: "javascript",
+  ts: "typescript",
+  tsx: "typescript",
+  java: "java",
+  c: "c",
+  h: "c",
+  cpp: "cpp",
+  cc: "cpp",
+  cxx: "cpp",
+  hpp: "cpp",
+  cs: "csharp",
+  go: "go",
+  rs: "rust",
+  php: "php",
+  rb: "ruby",
+  kt: "kotlin",
+  swift: "swift",
+  dart: "dart",
+  scala: "scala",
+  r: "r",
+  pl: "perl",
+  lua: "lua",
+  sh: "bash",
+  bash: "bash",
+  sql: "sql",
+  html: "html",
+  htm: "html",
+  css: "css"
+};
+
+/*
+|--------------------------------------------------------------------------
+| App
+|--------------------------------------------------------------------------
+*/
 
 export default function App() {
-
   const [files, setFiles] = useState(initialFiles);
   const [activeFileId, setActiveFileId] = useState("main");
+
   const [theme, setTheme] = useState(
-    localStorage.getItem("pixelcode-theme") || "dark"
+    () => localStorage.getItem("pixelcode-theme") || "dark"
   );
+
   const [review, setReview] = useState(null);
   const [reviewing, setReviewing] = useState(false);
   const [error, setError] = useState("");
   const [running, setRunning] = useState(false);
   const [execution, setExecution] = useState(null);
+
+  /*
+  |--------------------------------------------------------------------------
+  | Explorer resizing and visibility
+  |--------------------------------------------------------------------------
+  */
+
+  const [sidebarWidth, setSidebarWidth] = useState(220);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [resizingSidebar, setResizingSidebar] = useState(false);
+
+  const workspaceRef = useRef(null);
 
   /*
   |--------------------------------------------------------------------------
@@ -323,12 +376,49 @@ export default function App() {
 
   const activeFile = useMemo(
     () =>
-      files.find(
-        (file) => file.id === activeFileId
-      ) || files[0],
+      files.find((file) => file.id === activeFileId) || files[0],
     [files, activeFileId]
   );
 
+  /*
+  |--------------------------------------------------------------------------
+  | Drag to resize Explorer
+  |--------------------------------------------------------------------------
+  */
+
+  useEffect(() => {
+    if (!resizingSidebar) return;
+
+    function handlePointerMove(event) {
+      if (!workspaceRef.current) return;
+
+      const bounds = workspaceRef.current.getBoundingClientRect();
+
+      const nextWidth = event.clientX - bounds.left;
+
+      setSidebarWidth(
+        Math.min(420, Math.max(160, nextWidth))
+      );
+    }
+
+    function stopResizing() {
+      setResizingSidebar(false);
+    }
+
+    document.body.classList.add("resizing-sidebar");
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", stopResizing);
+    window.addEventListener("pointercancel", stopResizing);
+
+    return () => {
+      document.body.classList.remove("resizing-sidebar");
+
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", stopResizing);
+      window.removeEventListener("pointercancel", stopResizing);
+    };
+  }, [resizingSidebar]);
 
   /*
   |--------------------------------------------------------------------------
@@ -337,7 +427,6 @@ export default function App() {
   */
 
   function updateCode(value) {
-
     setFiles((currentFiles) =>
       currentFiles.map((file) =>
         file.id === activeFileId
@@ -349,8 +438,9 @@ export default function App() {
       )
     );
 
+    setReview(null);
+    setError("");
   }
-
 
   /*
   |--------------------------------------------------------------------------
@@ -359,16 +449,69 @@ export default function App() {
   */
 
   function changeTheme(nextTheme) {
-
     setTheme(nextTheme);
 
-    localStorage.setItem(
-      "pixelcode-theme",
-      nextTheme
-    );
-
+    localStorage.setItem("pixelcode-theme", nextTheme);
   }
 
+  /*
+  |--------------------------------------------------------------------------
+  | Create a new file
+  |--------------------------------------------------------------------------
+  */
+
+  function createFile() {
+    const filename = window.prompt(
+      "Enter a filename with its extension:",
+      "newfile.js"
+    );
+
+    if (filename === null) return;
+
+    const name = filename.trim();
+
+    if (
+      !name ||
+      /[<>:"\/\\|?*\x00-\x1f]/.test(name) ||
+      name.endsWith(".") ||
+      name.endsWith(" ")
+    ) {
+      window.alert("Please enter a valid filename.");
+      return;
+    }
+
+    if (
+      files.some(
+        (file) => file.name.toLowerCase() === name.toLowerCase()
+      )
+    ) {
+      window.alert("A file with this name already exists.");
+      return;
+    }
+
+    const extension = name.includes(".")
+      ? name.split(".").pop().toLowerCase()
+      : "";
+
+    const language = extensionLanguages[extension] || "javascript";
+    const template = languageTemplates[language];
+
+    const newFile = {
+      id: `file-${Date.now()}-${Math.random()
+        .toString(36)
+        .slice(2, 7)}`,
+      name,
+      language,
+      code: template?.starter || ""
+    };
+
+    setFiles((currentFiles) => [...currentFiles, newFile]);
+
+    setActiveFileId(newFile.id);
+    setReview(null);
+    setError("");
+    setExecution(null);
+  }
 
   /*
   |--------------------------------------------------------------------------
@@ -377,218 +520,151 @@ export default function App() {
   */
 
   function changeLanguage(language) {
-
     const template = languageTemplates[language];
 
-    if (!template) {
-      return;
-    }
+    if (!template || !activeFile) return;
 
     setFiles((currentFiles) =>
       currentFiles.map((file) => {
-
-        if (file.id !== activeFileId) {
-          return file;
-        }
+        if (file.id !== activeFileId) return file;
 
         return {
           ...file,
-
           language,
-
           name:
             language === "java"
               ? "Main.java"
               : `main.${template.extension}`,
-
-          code: template.starter
+          code: template.starter,
+          lastReviewedCode: undefined
         };
-
       })
     );
 
     setReview(null);
     setError("");
-
+    setExecution(null);
   }
+
+  /*
+  |--------------------------------------------------------------------------
+  | AI code review
+  |--------------------------------------------------------------------------
+  */
 
   async function reviewCode() {
-
     if (!activeFile?.code?.trim()) {
-
-      setError(
-        "There is no code to review."
-      );
-
+      setError("There is no code to review.");
       return;
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Don't review unchanged code
-    |--------------------------------------------------------------------------
-    */
-
-    if (
-      activeFile.lastReviewedCode ===
-      activeFile.code
-    ) {
-
+    if (activeFile.lastReviewedCode === activeFile.code) {
       return;
-
     }
-
 
     setReviewing(true);
-
     setError("");
-
     setReview(null);
 
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/review",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            code: activeFile.code,
+            language: activeFile.language,
+            filename: activeFile.name
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Code review failed.");
+      }
+
+      setReview(data.review);
+
+      const reviewedFileId = activeFile.id;
+      const reviewedCode = activeFile.code;
+
+      setFiles((currentFiles) =>
+        currentFiles.map((file) =>
+          file.id === reviewedFileId
+            ? {
+                ...file,
+                lastReviewedCode: reviewedCode
+              }
+            : file
+        )
+      );
+    } catch (err) {
+      setError(
+        err.message || "Unable to connect to PixelCode backend."
+      );
+    } finally {
+      setReviewing(false);
+    }
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Run code
+  |--------------------------------------------------------------------------
+  */
+
+  async function runCode() {
+    if (!activeFile?.code?.trim()) {
+      setError("There is no code to run.");
+      return;
+    }
+
+    setRunning(true);
+    setError("");
+    setExecution(null);
 
     try {
+      const response = await fetch(
+        "http://localhost:5000/api/run",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            code: activeFile.code,
+            language: activeFile.language,
+            filename: activeFile.name
+          })
+        }
+      );
 
-      const response =
-        await fetch(
-          "http://localhost:5000/api/review",
-          {
-            method: "POST",
+      const data = await response.json();
 
-            headers: {
-              "Content-Type":
-                "application/json"
-            },
-
-            body: JSON.stringify({
-
-              code:
-                activeFile.code,
-
-              language:
-                activeFile.language,
-
-              filename:
-                activeFile.name
-
-            })
-          }
-        );
-
-
-      const data =
-        await response.json();
-
-
-      if (
-        !response.ok ||
-        !data.success
-      ) {
-
-        throw new Error(
-          data.error ||
-          "Code review failed."
-        );
-
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Code execution failed.");
       }
 
-
-      setReview(
-        data.review
-      );
-
-
-      /*
-      |--------------------------------------------------------------------------
-      | Remember reviewed version
-      |--------------------------------------------------------------------------
-      */
-
-      setFiles(
-        (currentFiles) =>
-          currentFiles.map(
-            (file) =>
-              file.id ===
-              activeFileId
-                ? {
-                    ...file,
-
-                    lastReviewedCode:
-                      file.code
-                  }
-                : file
-          )
-      );
-
-
+      setExecution({
+        output: data.output || "",
+        error: data.error || "",
+        exitCode: data.exitCode
+      });
     } catch (err) {
-
-      setError(
-        err.message ||
-        "Unable to connect to PixelCode backend."
-      );
-
+      setExecution({
+        output: "",
+        error: err.message || "Unable to execute code.",
+        exitCode: 1
+      });
     } finally {
-
-      setReviewing(false);
-
+      setRunning(false);
     }
-
   }
-
-async function runCode() {
-  if (!activeFile?.code?.trim()) {
-    setError("There is no code to run.");
-    return;
-  }
-
-  setRunning(true);
-  setError("");
-  setExecution(null);
-
-  try {
-    const response = await fetch(
-      "http://localhost:5000/api/run",
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-          code: activeFile.code,
-          language: activeFile.language,
-          filename: activeFile.name
-        })
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok || !data.success) {
-      throw new Error(
-        data.error || "Code execution failed."
-      );
-    }
-
-    setExecution({
-      output: data.output || "",
-      error: data.error || "",
-      exitCode: data.exitCode
-    });
-
-  } catch (err) {
-    setExecution({
-      output: "",
-      error:
-        err.message ||
-        "Unable to execute code."
-    });
-  } finally {
-    setRunning(false);
-  }
-}
 
   /*
   |--------------------------------------------------------------------------
@@ -597,15 +673,11 @@ async function runCode() {
   */
 
   return (
-
     <div
       className={`app ${
-        theme === "light"
-          ? "theme-light"
-          : "theme-dark"
+        theme === "light" ? "theme-light" : "theme-dark"
       }`}
     >
-
       <Navbar
         theme={theme}
         onThemeChange={changeTheme}
@@ -614,24 +686,52 @@ async function runCode() {
         reviewing={reviewing}
         running={running}
         activeFile={activeFile}
+        onToggleSidebar={() =>
+          setSidebarOpen((open) => !open)
+        }
+        sidebarOpen={sidebarOpen}
       />
 
-
-      <main className="workspace">
+      <main
+        className="workspace"
+        ref={workspaceRef}
+        style={{
+          gridTemplateColumns: `${
+            sidebarOpen ? `${sidebarWidth}px` : "0px"
+          } 5px minmax(0, 1fr) 360px`
+        }}
+      >
+        {/* FILE EXPLORER */}
 
         <Sidebar
           files={files}
           activeFileId={activeFileId}
           onSelectFile={setActiveFileId}
+          onCreateFile={createFile}
         />
 
+        {/* EXPLORER RESIZE HANDLE */}
+
+        <div
+          className={`sidebar-resize-handle ${
+            resizingSidebar ? "is-resizing" : ""
+          }`}
+          onPointerDown={(event) => {
+            if (!sidebarOpen) return;
+
+            event.preventDefault();
+            setResizingSidebar(true);
+          }}
+          role="separator"
+          aria-label="Resize file explorer"
+          aria-orientation="vertical"
+          title="Drag to resize file explorer"
+        />
+
+        {/* EDITOR WORKSPACE */}
 
         <section className="editor-area">
-
-          {/* Language selector */}
-
           <div className="language-toolbar">
-
             <label htmlFor="language-select">
               Language
             </label>
@@ -643,24 +743,15 @@ async function runCode() {
                 changeLanguage(event.target.value)
               }
             >
-
               {Object.entries(languageTemplates).map(
                 ([key, language]) => (
-
-                  <option
-                    key={key}
-                    value={key}
-                  >
+                  <option key={key} value={key}>
                     {language.name}
                   </option>
-
                 )
               )}
-
             </select>
-
           </div>
-
 
           <Editor
             file={activeFile}
@@ -672,75 +763,51 @@ async function runCode() {
             running={running}
           />
 
+          {/* MOBILE REVIEW PANEL */}
 
           <div className="mobile-review">
-
             <Review
               review={review}
               reviewing={reviewing}
               error={error}
               onReview={reviewCode}
             />
-
           </div>
-
         </section>
 
+        {/* AI REVIEW PANEL */}
 
         <aside className="review-area">
-
           <Review
             review={review}
             reviewing={reviewing}
             error={error}
             onReview={reviewCode}
           />
-
         </aside>
-
       </main>
 
+      {/* STATUS BAR */}
 
       <footer className="statusbar">
-
         <div>
-
           <span className="status-dot" />
-
           AI Ready
-
         </div>
-
 
         <div>
-
-          {languageTemplates[
-            activeFile?.language
-          ]?.name || "Plain Text"}
-
+          {languageTemplates[activeFile?.language]?.name ||
+            "Plain Text"}
         </div>
 
+        <div>UTF-8</div>
 
-        <div>
-          UTF-8
-        </div>
-
-
-        <div>
-          Spaces: 4
-        </div>
-
+        <div>Spaces: 4</div>
 
         <div className="status-right">
-
           PixelCode AI
-
         </div>
-
       </footer>
-
     </div>
-
   );
-
 }

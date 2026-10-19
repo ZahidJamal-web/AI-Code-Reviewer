@@ -159,18 +159,13 @@ select:focus-visible {
 
 .project-selector {
   height: 33px;
-
   display: flex;
   align-items: center;
   gap: 8px;
-
   padding: 0 10px;
-
   background: var(--surface-2);
-
   border: 1px solid var(--border);
   border-radius: 7px;
-
   color: var(--text-soft);
   font-size: 11px;
 }
@@ -178,11 +173,8 @@ select:focus-visible {
 .project-dot {
   width: 7px;
   height: 7px;
-
   border-radius: 50%;
-
   background: var(--green);
-
   box-shadow:
     0 0 8px rgba(52, 211, 153, 0.45);
 }
@@ -195,9 +187,7 @@ select:focus-visible {
   display: flex;
   align-items: center;
   gap: 7px;
-
   color: var(--text-soft);
-
   font-family: "JetBrains Mono", monospace;
   font-size: 11px;
 }
@@ -248,32 +238,23 @@ select:focus-visible {
 
 .review-button {
   height: 35px;
-
   display: flex;
   align-items: center;
   gap: 7px;
-
   padding: 0 13px;
-
   border: 0;
   border-radius: 7px;
-
   color: white;
-
   background: linear-gradient(
     135deg,
     #8b5cf6,
     #6842db
   );
-
   cursor: pointer;
-
   font-size: 11px;
   font-weight: 600;
-
   box-shadow:
     0 5px 20px rgba(111, 78, 220, 0.2);
-
   transition:
     transform 0.2s ease,
     opacity 0.2s ease;
@@ -295,10 +276,8 @@ select:focus-visible {
 .theme-button {
   width: 35px;
   height: 35px;
-
   display: grid;
   place-items: center;
-
   border-radius: 7px;
 }
 
@@ -323,33 +302,60 @@ select:focus-visible {
 ========================================================= */
 
 .sidebar {
+  overflow: hidden;
   min-width: 0;
-
   display: flex;
   flex-direction: column;
-
   background: var(--surface);
-
   border-right: 1px solid var(--border);
+}
+
+.sidebar-resize-handle {
+  position: relative;
+  z-index: 5;
+  width: 5px;
+  height: 100%;
+  cursor: col-resize;
+  background: var(--surface);
+  touch-action: none;
+  transition: background 0.15s ease;
+}
+
+.sidebar-resize-handle:hover,
+.sidebar-resize-handle.is-resizing {
+  background: var(--accent);
+}
+
+.sidebar-resize-handle::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -3px;
+  right: -3px;
 }
 
 .sidebar-header {
   height: 46px;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   padding: 0 13px;
-
   border-bottom: 1px solid var(--border);
-
   color: var(--text-muted);
-
   font-size: 10px;
   font-weight: 700;
-
   letter-spacing: 0.8px;
+}
+
+body.resizing-sidebar,
+body.resizing-sidebar * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
+.sidebar-toggle {
+  flex-shrink: 0;
 }
 
 .sidebar-actions {
@@ -360,16 +366,12 @@ select:focus-visible {
 .sidebar-actions button {
   width: 26px;
   height: 26px;
-
   display: grid;
   place-items: center;
-
   border: 0;
   border-radius: 5px;
-
   background: transparent;
   color: var(--text-muted);
-
   cursor: pointer;
 }
 
@@ -380,21 +382,6 @@ select:focus-visible {
 
 .project-tree {
   padding: 12px 8px;
-}
-
-.tree-project {
-  height: 30px;
-
-  display: flex;
-  align-items: center;
-  gap: 6px;
-
-  padding: 0 7px;
-
-  color: var(--text-soft);
-
-  font-size: 11px;
-  font-weight: 700;
 }
 
 .folder-icon {
@@ -408,24 +395,17 @@ select:focus-visible {
 .file-item {
   width: 100%;
   height: 34px;
-
   display: flex;
   align-items: center;
   gap: 9px;
-
   padding: 0 10px;
-
   border: 0;
   border-radius: 6px;
-
   background: transparent;
   color: var(--text-soft);
-
   cursor: pointer;
-
   font-size: 11px;
   text-align: left;
-
   transition: 0.15s ease;
 }
 
@@ -449,20 +429,15 @@ select:focus-visible {
 
 .sidebar-bottom {
   margin-top: auto;
-
   padding: 14px;
-
   border-top: 1px solid var(--border);
 }
 
 .workspace-label {
   margin-bottom: 9px;
-
   color: var(--text-muted);
-
   font-size: 9px;
   font-weight: 700;
-
   letter-spacing: 0.8px;
 }
 
@@ -475,15 +450,11 @@ select:focus-visible {
 .workspace-avatar {
   width: 29px;
   height: 29px;
-
   display: grid;
   place-items: center;
-
   border-radius: 7px;
-
   background: var(--accent-bg);
   color: var(--accent);
-
   font-size: 12px;
   font-weight: 700;
 }
@@ -495,11 +466,8 @@ select:focus-visible {
 
 .workspace-info span {
   display: block;
-
   margin-top: 2px;
-
   color: var(--text-muted);
-
   font-size: 9px;
 }
 
@@ -520,13 +488,11 @@ select:focus-visible {
 .editor-container {
   min-width: 0;
   min-height: 0;
-
   flex: 1;
-
   display: flex;
   flex-direction: column;
-
   background: var(--bg);
+  overflow: hidden;
 }
 
 /* =========================================================
@@ -591,6 +557,86 @@ select:focus-visible {
 .language-toolbar option {
   background: #111620;
   color: #f3f5f8;
+}
+
+/* =========================================
+   FILE EXPLORER SEARCH
+========================================= */
+
+.explorer-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 10px 9px 0;
+  padding: 0 8px;
+  height: 32px;
+  min-width: 0;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+}
+
+.explorer-search:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-bg);
+}
+
+.explorer-search input {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  outline: none;
+  font: inherit;
+  font-size: 11px;
+}
+
+.explorer-search input::placeholder {
+  color: var(--text-muted);
+}
+
+.explorer-search button {
+  display: grid;
+  place-items: center;
+  padding: 3px;
+  border: 0;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.explorer-search button:hover {
+  color: var(--text);
+}
+
+.tree-project {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 7px;
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.folder-chevron-closed {
+  transform: rotate(-90deg);
+}
+
+.explorer-empty {
+  padding: 12px 8px;
+  color: var(--text-muted);
+  font-size: 11px;
+  overflow-wrap: anywhere;
 }
 
 /* =========================================================
@@ -743,13 +789,10 @@ select:focus-visible {
 ========================================================= */
 
 .monaco-wrapper {
-  flex: 1;
-
-  min-width: 0;
+  flex: 1 1 0;
   min-height: 0;
-
+  min-width: 0;
   overflow: hidden;
-
   background: var(--bg);
 }
 
@@ -1595,27 +1638,23 @@ select:focus-visible {
 ========================================================= */
 
 .execution-panel {
-  height: 190px;
-  min-height: 190px;
-
+  flex: 0 0 auto;
+  min-height: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-
   background: var(--surface);
-
   border-top: 1px solid var(--border);
 }
 
 .execution-header {
   height: 38px;
   min-height: 38px;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   padding: 0 13px;
-
+  flex-shrink: 0;
   border-bottom: 1px solid var(--border);
 }
 
@@ -1623,23 +1662,55 @@ select:focus-visible {
   display: flex;
   align-items: center;
   gap: 8px;
-
   color: var(--text-soft);
-
   font-size: 10px;
   font-weight: 700;
-
   letter-spacing: 0.08em;
+}
+
+.terminal-resize-handle {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 5px;
+  height: 5px;
+  color: var(--text-muted);
+  background: var(--border);
+  cursor: row-resize;
+  touch-action: none;
+  transition: background 0.15s ease;
+}
+
+.terminal-resize-handle svg {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.terminal-resize-handle:hover,
+.terminal-resize-handle.is-resizing {
+  background: var(--accent);
+}
+
+.terminal-resize-handle:hover svg,
+.terminal-resize-handle.is-resizing svg {
+  opacity: 1;
+  color: white;
+}
+
+body.resizing-terminal,
+body.resizing-terminal * {
+  cursor: row-resize !important;
+  user-select: none !important;
 }
 
 .terminal-dot {
   width: 7px;
   height: 7px;
-
   border-radius: 50%;
-
   background: var(--green);
-
   box-shadow:
     0 0 8px rgba(52, 211, 153, 0.45);
 }
@@ -1659,16 +1730,47 @@ select:focus-visible {
 
 .execution-output {
   flex: 1;
-
+  min-height: 0;
   overflow: auto;
-
   padding: 12px 14px;
-
   font-family: "JetBrains Mono", monospace;
-
   font-size: 11px;
-
   line-height: 1.6;
+}
+
+.terminal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.terminal-toggle {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.terminal-toggle:hover {
+  color: var(--text);
+  background: var(--surface-3);
+  border-color: var(--border);
+}
+
+.execution-panel.terminal-collapsed {
+  flex: 0 0 38px;
+}
+
+.terminal-collapsed .execution-header {
+  border-bottom: 0;
 }
 
 .terminal-stdout,
@@ -1787,10 +1889,7 @@ select:focus-visible {
 
 @media (max-width: 1200px) {
   .workspace {
-    grid-template-columns:
-      190px
-      minmax(380px, 1fr)
-      340px;
+   grid-template-columns: 220px 5px minmax(300px, 1fr) 360px;
   }
 
   .brand {
@@ -1805,8 +1904,9 @@ select:focus-visible {
 @media (max-width: 950px) {
   .workspace {
     grid-template-columns:
-      185px
-      1fr;
+      var(--sidebar-width, 200px)
+      5px
+      minmax(250px, 1fr);
   }
 
   .review-area {
@@ -1815,9 +1915,7 @@ select:focus-visible {
 
   .mobile-review {
     display: block;
-
     height: 460px;
-
     border-top: 1px solid var(--border);
   }
 
@@ -1843,6 +1941,7 @@ select:focus-visible {
 
   .brand {
     min-width: auto;
+    gap: 7px;
   }
 
   .brand-subtitle,
@@ -1851,15 +1950,22 @@ select:focus-visible {
     display: none;
   }
 
+  .review-button {
+    padding: 0 9px;
+  }
+
   .brand-name {
     font-size: 13px;
   }
 
   .workspace {
     display: block;
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .sidebar {
+  .sidebar,
+  .sidebar-resize-handle,
+  .sidebar-toggle{
     display: none;
   }
 
