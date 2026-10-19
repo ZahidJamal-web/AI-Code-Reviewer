@@ -6,6 +6,11 @@ import Sidebar from "./components/Sidebar";
 import Editor from "./components/Editor";
 import Review from "./components/Review";
 
+const API_URL = (
+  import.meta.env.VITE_API_URL ||
+  "https://pixelcode-ai-backend.vercel.app"
+).replace(/\/+$/, "");
+
 /*
 |--------------------------------------------------------------------------
 | Language configuration
@@ -568,7 +573,7 @@ export default function App() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/review",
+        "${API_URL}/api/review",
         {
           method: "POST",
           headers: {
@@ -630,7 +635,7 @@ export default function App() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/run",
+        "${API_URL}/api/run",
         {
           method: "POST",
           headers: {
