@@ -672,19 +672,9 @@ app.get(
   (req, res) => {
     res.json({
       success: true,
-
-      message:
-        "PixelCode backend is running",
-
-      provider: "OPENROUTER",
-
-      OPENROUTERUrl: OPENROUTER_API_KEY,
-
-      model: OPENROUTER_MODEL,
-
-      reviewTimeout:
-        AI_REVIEW_TIMEOUT,
-
+      message: "PixelCode backend is running",
+      provider: "OpenRouter",
+      model: OPENROUTER_MODEL || "not configured",
       staticAnalysis: true
     });
   }
@@ -1489,57 +1479,22 @@ app.use(
   }
 );
 
+
 /*
 |--------------------------------------------------------------------------
 | SERVER
 |--------------------------------------------------------------------------
 */
 
-app.listen(
-  PORT,
-  () => {
-    console.log("");
+// Export the Express application for Vercel.
+export default app;
 
-    console.log(
-      "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    );
-
-    console.log(
-      "       PIXELCODE BACKEND"
-    );
-
-    console.log(
-      "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    );
-
-    console.log(
-      `🚀 Server: http://localhost:${PORT}`
-    );
-
-    console.log(
-      `🤖 AI Provider: NVIDIA`
-    );
-
-    console.log(
-      `🔗 Nvidia: ${OPENROUTER_API_KEY}`
-    );
-
-    console.log(
-      `🧠 Model: ${OPENROUTER_MODEL}`
-    );
-
-    console.log(
-      `⚡ AI timeout: ${AI_REVIEW_TIMEOUT}ms`
-    );
-
-    console.log(
-      `🔍 Static analysis: ENABLED`
-    );
-
-    console.log(
-      "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    );
-
-    console.log("");
-  }
-);
+// Start a local server only outside Vercel.
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`PixelCode backend running at http://localhost:${PORT}`);
+    console.log(`AI provider: OpenRouter`);
+    console.log(`AI model: ${OPENROUTER_MODEL || "not configured"}`);
+    console.log(`Static analysis: enabled`);
+  });
+}
