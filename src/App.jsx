@@ -573,7 +573,7 @@ export default function App() {
 
     try {
       const response = await fetch(
-        '${API_URL}/api/review',
+        `${API_URL}/api/review`,
         {
           method: "POST",
           headers: {
@@ -635,7 +635,7 @@ export default function App() {
 
     try {
       const response = await fetch(
-        '${API_URL}/api/run',
+        `${API_URL}/api/run`,
         {
           method: "POST",
           headers: {
